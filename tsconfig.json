@@ -6,5 +6,5 @@
     "verbatimModuleSyntax": true, "jsx": "preserve", "jsxImportSource": "@opentui/solid",
     "esModuleInterop": true, "noUnusedLocals": true, "noUnusedParameters": true
   },
-  "include": ["tui.tsx", "src/**/*.ts", "src/**/*.tsx", "test/**/*.ts"]
+  "include": ["tui.tsx", "src/**/*.ts", "src/**/*.tsx", "scripts/**/*.ts", "test/**/*.ts"]
 }

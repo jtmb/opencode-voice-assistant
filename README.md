@@ -10,10 +10,12 @@ Tested target: Ubuntu 26.04, OpenCode **2.1.1**, Python 3.14, PipeWire with its 
 git clone https://github.com/jtmb/opencode-voice-assistant.git
 cd opencode-voice-assistant
 ./setup.sh
-./opencode-voice /path/to/your/project
+node --experimental-strip-types scripts/register.ts
+node --experimental-strip-types scripts/register.ts --apply
+opencode /path/to/your/project
 ```
 
-The launcher executes the installed, unmodified `opencode` command with this plugin added to its CLI configuration for that process. It preserves the other configured plugins, JSONC settings and existing inline configuration. It writes no global configuration and starts no separate agent server. Open or select an OpenCode session to begin using voice.
+The registration command previews a change to OpenCode's native `cli.json`. `--apply` backs up the file and adds only this plugin, preserving existing plugins, options, comments, preferences and file permissions. Repeating registration is a no-op. It starts no application or server. After registration, start OpenCode normally with `opencode`; no separate launcher is provided. Open or select an OpenCode session to begin using voice.
 
 For a computer-use checkout, this package is the `voice-assistant` submodule:
 
@@ -21,10 +23,12 @@ For a computer-use checkout, this package is the `voice-assistant` submodule:
 git submodule update --init voice-assistant
 cd voice-assistant
 ./setup.sh
-./opencode-voice
+node --experimental-strip-types scripts/register.ts --source ../global/cli.json
+node --experimental-strip-types scripts/register.ts --source ../global/cli.json --apply
+opencode
 ```
 
-To register it permanently, include its absolute package directory in the `plugins` array of your canonical CLI configuration source, preserving existing entries. In computer-use, use that repository's preview/apply/backup deployment workflow for `cli.json`. The package exports only `./tui`; server-plugin registration is unnecessary. The launcher is the configuration-free alternative.
+In computer-use, the package directory is declared in the canonical `global/cli.json` template. `--source` verifies that declaration before deploying the plugin entry to the active profile. This plugins-only deployment avoids replacing unrelated live settings with template defaults. `--config-dir DIR` can select an explicit profile; otherwise registration discovers the active profile through `opencode debug paths`. The package exports only `./tui`; server-plugin registration and a backend restart are unnecessary.
 
 Setup installs pinned dependencies and checksum-verified Vosk English and Piper Lessac-medium models inside the package. It never downloads a conversation model. `--reuse-models DIR` can copy matching existing model files after checking their hashes.
 
@@ -84,7 +88,7 @@ See [ACCEPTANCE.md](ACCEPTANCE.md) for actual verification and remaining limitat
 - If another TUI owns the microphone, disable voice there or close that TUI.
 - If speech is misheard, use transcript-review mode or correct the text in OpenCode.
 - During model loading, ordinary OpenCode typing and work remain available.
-- To unload, close the launcher-started TUI and open ordinary `opencode`. If permanently registered, remove only this package's entry through your normal configuration deployment workflow.
+- To disable the plugin, use OpenCode's native Plugins dialog. To unregister it, remove only this package's entry from the canonical and active CLI configuration through your normal configuration workflow. Registration backups live next to the CLI configuration file.
 
 ## Components and notices
 

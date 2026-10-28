@@ -21,4 +21,5 @@ uv pip install --python .venv/bin/python -r "$LOCK"
 npm ci --ignore-scripts --no-audit --no-fund
 python3 scripts/download_models.py "${MODEL_ARGS[@]}"
 chmod +x scripts/audio-worker.sh
-echo 'Speech dependencies ready. See README.md to register the TUI plugin.'
+echo 'Speech dependencies ready. Preview native registration: node --experimental-strip-types scripts/register.ts'
+echo 'Apply registration with --apply, then start OpenCode normally with opencode.'

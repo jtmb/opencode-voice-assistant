@@ -5,17 +5,23 @@ Target: Ubuntu 26.04.1; Intel i5-6200U; about 7 GiB RAM; OpenCode 2.1.1.
 ## Completed checks
 
 - Strict TypeScript check against the real OpenCode 2.1.1 SDK.
-- 8 TypeScript behavior tests: session routing, stale/disabled recordings,
+- 13 TypeScript behavior tests: native CLI registration, preservation and backup,
+  concurrent-edit refusal, session routing, stale/disabled recordings,
   edited/discarded review, voice-only/all readout, streaming Markdown filtering,
   cancellation, and discovery through the real SDK's local-package loader.
-- 11 Python tests: protocol validation, cancellation, microphone EOF cleanup and
-  JSONC/configuration preservation; Python lint and strict type checks pass.
+- 8 Python tests: protocol validation, cancellation and microphone EOF cleanup;
+  Python lint and strict type checks pass.
 - Real CPU recognition of a synthesized question and local speech synthesis.
 - A temporary PipeWire echo-cancellation source/sink starts and is removed on close.
 - Speech namespace has no external network access.
 
 ## Live verification
 
+- Plain `opencode` loaded the voice footer and native Settings dialog from its
+  persistent CLI configuration, with no launcher or inline plugin override.
+  Native registration changed only the plugin entry, preserved all previous
+  settings/plugins and file permissions, and created a byte-identical backup.
+  Repeated registration made no change. The separate launcher was removed.
 - The unmodified installed OpenCode 2.1.1 TUI loaded the plugin footer and Settings
   dialog. Both submission/readout alternatives were selected, then restored to
   automatic submission and voice-only readout. Microphone off/on controls worked.

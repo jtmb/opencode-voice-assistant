@@ -10,6 +10,8 @@ Honor applicable parent instructions. In the computer-use checkout, also read
 - Use only public `@opencode/plugin/tui` and authenticated `context.client` APIs.
 - Never modify the OpenCode binary, import private TUI internals, start an LLM
   server, add an agent loop, or rebuild a desktop chat application.
+- Register through OpenCode's native CLI configuration. Do not add or maintain
+  a separate OpenCode launcher, command shim, or startup environment overlay.
 - `src/` contains the TUI adapter, speech presentation and worker transport.
 - `audio/` contains a local CPU-only Vosk/Piper subprocess, communicating over
   JSON lines on stdin/stdout. Stdout is protocol only; diagnostics go to stderr.
