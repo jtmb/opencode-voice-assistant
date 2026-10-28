@@ -33,6 +33,8 @@ export default Plugin.define({
         if (model) await context.client.session.switchModel({
           sessionID, model: { providerID: model.providerID, id: model.modelID, variant: model.variant },
         })
+        const route = context.ui.router.current()
+        if (route.type !== "session" || route.sessionID !== sessionID) throw new Error("Session changed; spoken request discarded.")
         await context.client.session.prompt({ sessionID, text, id })
       },
       async interrupt(sessionID) { await context.client.session.interrupt({ sessionID, resume: false }) },
@@ -47,6 +49,7 @@ export default Plugin.define({
       const sessionID = route.type === "session" ? route.sessionID : undefined
       if (controller.session !== sessionID) parts.clear()
       controller.setSession(sessionID)
+      controller.configure()
     })
 
     async function preferences(): Promise<void> {

@@ -24,6 +24,7 @@ export class VoiceController {
   private streams = new Map<string, Sentences>()
   private blocked = new Set<string>()
   private disposed = false
+  private active = false
 
   constructor(host: Host, settings: () => Settings) {
     this.host = host
@@ -44,7 +45,14 @@ export class VoiceController {
   }
 
   configure(): void {
-    this.host.send({ type: "configure", enabled: this.settings().enabled && !!this.session, epoch: this.epoch })
+    const enabled = this.settings().enabled && !!this.session
+    if (this.active && !enabled) {
+      this.epoch++
+      this.host.send({ type: "cancel", epoch: this.epoch })
+      this.host.partial("")
+    }
+    this.active = enabled
+    this.host.send({ type: "configure", enabled, epoch: this.epoch })
   }
 
   listen(): void {

@@ -101,3 +101,15 @@ test("the actual SDK discovers the local TUI entrypoint and no server harness", 
   assert.equal(entries.server, undefined)
   assert.equal(PluginHost.resolve({ directory: "/tmp/nonexistent-voice-plugin" }).tui, undefined)
 })
+
+test("disabling voice invalidates an in-flight transcript but still allows explicit one-shot input", async () => {
+  const f = fixture()
+  const oldEpoch = f.controller.epoch
+  f.settings.enabled = false
+  f.controller.configure()
+  await f.controller.worker({ type: "transcript", text: "Too late", epoch: oldEpoch })
+  assert.equal(f.prompts.length, 0)
+  f.controller.listen()
+  await f.controller.worker({ type: "transcript", text: "Manual request", epoch: f.controller.epoch })
+  assert.equal(f.prompts[0].text, "Manual request")
+})

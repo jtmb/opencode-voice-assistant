@@ -1,6 +1,9 @@
 """Protocol and real worker orchestration, isolating audio device boundaries."""
 
+import subprocess
+import sys
 import threading
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -77,3 +80,39 @@ def test_session_epoch_discards_stale_speech_and_cancels_old_queue() -> None:
     assert not worker.enabled
     worker.close()
     assert worker.closed.is_set()
+
+
+def test_microphone_eof_reports_failure_and_releases_ownership(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """A failed capture cannot leave a phantom listening state or held lock."""
+
+    class EmptySpeech(FakeSpeech):
+        """The recognizer is never fed because the device returns EOF."""
+
+        def recognizer(self, wake: bool = False) -> object:
+            """Return a placeholder at the model I/O boundary."""
+            return object()
+
+    class EmptyAudio(FakeAudio):
+        """Provide a real EOF pipe instead of a microphone device."""
+
+        def record(self) -> subprocess.Popen[bytes]:
+            """Create and own an immediately closing device pipe."""
+            self.capture = subprocess.Popen([sys.executable, "-c", "pass"], stdout=subprocess.PIPE)
+            return self.capture
+
+    monkeypatch.setattr("audio.worker.ROOT", tmp_path)
+    events: list[dict[str, str | int]] = []
+    audio: Any = EmptyAudio()
+    speech: Any = EmptySpeech()
+    worker = Worker(speech, audio, events.append)
+    worker.handle(command('{"type":"configure","epoch":1,"enabled":true}'))
+    worker.start()
+    assert worker.closed.wait(3)
+    worker.close()
+    assert any(
+        event.get("type") == "error" and "microphone" in str(event.get("message")).lower()
+        for event in events
+    )
+    assert audio.capture.poll() is not None
