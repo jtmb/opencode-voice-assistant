@@ -1,0 +1,22 @@
+# Dependencies and downloaded speech models
+node_modules/
+.venv/
+models/
+
+# Runtime and test artifacts
+state/
+.cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+*.tsbuildinfo
+*.log
+
+# Local credentials
+.env
+.env.*
+!.env.example
+*.pem
